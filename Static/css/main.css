@@ -19,5 +19,16 @@ body {
 .nav-top ul li a:hover{
   color: #0D9DBB;
 }
+.logo{
+  box-shadow: 2px 5px 15px #999;
+  border-radius: 6px;
+}
+.navbar-links button{
+  transition: all 0.4s;
+  transition-property: transform;
+}
+.navbar-links button:hover{
+  transform: translateY(1px);
+}
 
   

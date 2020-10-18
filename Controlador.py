@@ -25,7 +25,6 @@ def acceso():
             session['id'] = user[0]
             # al  acceder exitosamente traemos la informacion de los contactos
             db.execute('SELECT * FROM empresa.empleado')
-            data = db.fetchall()
             db.close()
             con.close()
             #return redirect(url_for('Index'))
@@ -65,7 +64,6 @@ def Index():
         data2 = db.fetchall()
         db.close()
     user = session['username']
-    print(data1[0], data2[0])
     return render_template('index.html', user=user, empleado=data, cargos=data1, depto=data2)
 
 @app.route('/add_contact', methods=['POST'])
@@ -78,7 +76,6 @@ def add_contact():
         sueldo = request.form['sueldo']
         cargo = request.form['cargo']
         departamento = request.form['departamento']
-        print(cargo)
         con.connect()
         db=con.cursor()
         db.execute("INSERT INTO empresa.empleado (nombre, apellido, email, telefono, sueldo, Cargo_idCargo, Departamento_idDepartamento) VALUES (%s,%s,%s,%s,%s,%s,%s)", (name, lastname, email, phone, sueldo, cargo, departamento ))
@@ -94,7 +91,6 @@ def get_contact(id):
     data = db.fetchall()
     db.close()
     user = session['username']
-    print(data[0])
     return render_template('edit-contact.html', user=user, empleado = data[0])
 
 @app.route('/update/<id>', methods=['POST'])

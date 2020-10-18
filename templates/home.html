@@ -5,15 +5,16 @@
 
 {% block body %}
 
-  <div class="row">
+  <div class="row mt-4 pt-4">
     <div class="col-md-4 offset-md-4">
-    <a href="/principal" >
+      <img class="logo mb-4" src="{{url_for('static', filename='img/logo.jpeg')}}" alt="SysCompany" width="100%">
+    <a class="navbar-links" href="/principal" >
         <button type="button" class="btn btn-primary btn-md btn-block">Registro Empleado</button>
     </a> <br>
-    <a href="">
+    <a class="navbar-links" href="">
         <button type="button" class="btn btn-primary btn-md btn-block">Visualizar Departamentos</button>
     </a><br>
-    <a href="">
+    <a class="navbar-links" href="">
         <button type="button" class="btn btn-primary btn-md btn-block">Generar Reportes</button>
     </a>
   </div>
