@@ -63,8 +63,21 @@ def Index():
         db.execute('SELECT * FROM empresa.departamento')
         data2 = db.fetchall()
         db.close()
+    if data2:
+        con.connect()
+        db=con.cursor()
+        db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido, email as Email, telefono as Telefono,sueldo as Sueldo, cargo.descripcion as Cargo, sector.descripcion as Sector FROM empresa.empleado, empresa.cargo,empresa.sector 
+        where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector''')
+        data3 = db.fetchall()
+        db.close()
+    if data3:
+        con.connect()
+        db=con.cursor()
+        db.execute('SELECT * FROM empresa.sector')
+        data4 = db.fetchall()
+        db.close()
     user = session['username']
-    return render_template('index.html', user=user, empleado=data, cargos=data1, depto=data2)
+    return render_template('index.html', user=user, empleado=data, cargos=data1, depto=data2, empleados=data3, sector=data4)
 
 @app.route('/add_contact', methods=['POST'])
 def add_contact():
@@ -75,10 +88,10 @@ def add_contact():
         phone = request.form['phone']
         sueldo = request.form['sueldo']
         cargo = request.form['cargo']
-        departamento = request.form['departamento']
+        sector = request.form['sector']
         con.connect()
         db=con.cursor()
-        db.execute("INSERT INTO empresa.empleado (nombre, apellido, email, telefono, sueldo, Cargo_idCargo, Departamento_idDepartamento) VALUES (%s,%s,%s,%s,%s,%s,%s)", (name, lastname, email, phone, sueldo, cargo, departamento ))
+        db.execute("INSERT INTO empresa.empleado (nombre, apellido, email, telefono, sueldo, Cargo_idCargo, Sector_idSector) VALUES (%s,%s,%s,%s,%s,%s,%s)", (name, lastname, email, phone, sueldo, cargo, sector ))
         con.commit()
         flash('Empleado Added successfully')
         return redirect(url_for('Index'))
@@ -87,11 +100,25 @@ def add_contact():
 def get_contact(id):
     con.connect()
     db=con.cursor()
-    db.execute('SELECT * FROM empresa.empleado WHERE idEmpleado = %s', (id))
+    db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.descripcion, sector.descripcion 
+    FROM empresa.empleado, empresa.cargo, empresa.sector 
+    WHERE cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and idEmpleado = %s''', (id))
     data = db.fetchall()
     db.close()
+    if data:
+        con.connect()
+        db=con.cursor()
+        db.execute('SELECT * FROM empresa.cargo')
+        data1 = db.fetchall()
+        db.close()
+    if data1:
+        con.connect()
+        db=con.cursor()
+        db.execute('SELECT * FROM empresa.sector')
+        data2 = db.fetchall()
+        db.close()
     user = session['username']
-    return render_template('edit-contact.html', user=user, empleado = data[0])
+    return render_template('edit-contact.html', user=user, empleados= data[0], cargos=data1, sector=data2)
 
 @app.route('/update/<id>', methods=['POST'])
 def update_contact(id):
@@ -126,4 +153,14 @@ def delete_contact(id):
     flash('Empleado eliminado satisfactoriamente')
     return redirect(url_for('Index'))
 
-
+# Vista visualizar departamentos
+@app.route('/visualizar-departamentos')
+def VisualizarDepartamentos():
+    con.connect()
+    db=con.cursor()
+    db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+    where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and sector.Departamento_idDepartamento = departamento.idDepartamento;''')
+    data = db.fetchall()
+    db.close()
+    user = session['username']
+    return render_template('departamentos.html', user=user, empleados=data)
