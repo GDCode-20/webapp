@@ -128,6 +128,8 @@ def update_contact(id):
         email = request.form['email']
         phone = request.form['phone']
         sueldo = request.form['sueldo']
+        cargo = request.form['cargo']
+        sector = request.form['sector']
         con.connect()
         db=con.cursor()
         db.execute("""
@@ -136,10 +138,12 @@ def update_contact(id):
                 apellido = %s,
                 email = %s,
                 telefono = %s,
-                sueldo = %s
+                sueldo = %s,
+                Cargo_idCargo = %s,
+                Sector_idSector = %s
                 
             WHERE idEmpleado = %s
-        """, (name, lastname, email, phone, sueldo, id))
+        """, (name, lastname, email, phone, sueldo, cargo, sector, id))
         flash('Empleado actualizado satisfactoriamente')
         con.commit()
         return redirect(url_for('Index'))
