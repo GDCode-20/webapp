@@ -34,7 +34,7 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <select id="inputState" class="form-control">
+                <select id="inputState" name="cargo" class="form-control">
                   <option selected value="{{empleados.6}}">{{empleados.6}}</option>
                   {% for op in cargos %}
                   <option value={{op.0}}> {{op.1}} </option>
@@ -42,7 +42,7 @@
                 </select>
               </div>
               <div class="form-group col-md-6">
-                <select id="inputState" class="form-control">
+                <select id="inputState" name="sector" class="form-control">
                   <option selected value="{{empleados.7}}">{{empleados.7}}</option>
                   {% for sec in sector %}
                   <option value={{sec.0}}> {{sec.1}} </option>
