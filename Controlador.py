@@ -100,7 +100,7 @@ def add_contact():
 def get_contact(id):
     con.connect()
     db=con.cursor()
-    db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.descripcion, sector.descripcion 
+    db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.idCargo, cargo.descripcion, sector.idSector, sector.descripcion 
     FROM empresa.empleado, empresa.cargo, empresa.sector 
     WHERE cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and idEmpleado = %s''', (id))
     data = db.fetchall()
