@@ -66,7 +66,8 @@ def Index():
     if data2:
         con.connect()
         db=con.cursor()
-        db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido, email as Email, telefono as Telefono,sueldo as Sueldo, cargo.descripcion as Cargo, sector.descripcion as Sector FROM empresa.empleado, empresa.cargo,empresa.sector 
+        db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido, email as Email, telefono as Telefono,sueldo as Sueldo, cargo.descripcion as Cargo, sector.descripcion as Sector
+        FROM empresa.empleado, empresa.cargo,empresa.sector 
         where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector''')
         data3 = db.fetchall()
         db.close()
@@ -100,7 +101,7 @@ def add_contact():
 def get_contact(id):
     con.connect()
     db=con.cursor()
-    db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.descripcion, sector.descripcion 
+    db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.idCargo, cargo.descripcion, sector.idSector, sector.descripcion 
     FROM empresa.empleado, empresa.cargo, empresa.sector 
     WHERE cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and idEmpleado = %s''', (id))
     data = db.fetchall()
@@ -141,7 +142,6 @@ def update_contact(id):
                 sueldo = %s,
                 Cargo_idCargo = %s,
                 Sector_idSector = %s
-                
             WHERE idEmpleado = %s
         """, (name, lastname, email, phone, sueldo, cargo, sector, id))
         flash('Empleado actualizado satisfactoriamente')
