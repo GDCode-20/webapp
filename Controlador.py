@@ -1,5 +1,5 @@
 # importamos los modulos a usar en las rutas
-from flask import render_template, redirect, url_for, request, flash, session
+from flask import render_template, redirect, url_for, request, flash, session, json
 from werkzeug.security import check_password_hash, generate_password_hash
 # Importamos db y app para formar las rutas de la aplicacion
 from webapp import db, app, con
@@ -28,7 +28,8 @@ def acceso():
             db.close()
             con.close()
             #return redirect(url_for('Index'))
-            return render_template('home.html',user=session['username'])
+            user = session['username']
+            return render_template('home.html',user=user)
         else:
             flash('Error. Usuario y/o contraseña incorrectos.')
             return redirect(url_for('login'))
@@ -42,7 +43,8 @@ def Logout():
 @app.route('/home')
 def Home():
     if 'username' in session:
-      return render_template("home.html")
+        user = session['username']
+        return render_template("home.html", user=user)
 
 @app.route('/principal')
 def Index():
@@ -162,9 +164,47 @@ def delete_contact(id):
 def VisualizarDepartamentos():
     con.connect()
     db=con.cursor()
-    db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
-    where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and sector.Departamento_idDepartamento = departamento.idDepartamento;''')
+    db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector, codigoSupervisor
+    FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+    where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+    = empleado.Sector_idSector and sector.Departamento_idDepartamento
+    = departamento.idDepartamento and idEmpleado >5;''')
     data = db.fetchall()
     db.close()
+    if data:
+        con.connect()
+        db=con.cursor()
+        db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                idEmpleado<6;''')
+        data1 = db.fetchall()
+        db.close()
+        print(data1)
     user = session['username']
-    return render_template('departamentos.html', user=user, empleados=data)
+    return render_template('departamentos.html', user=user, empleados=data, sup=data1)
+
+
+# @app.route('/buscar', methods=['POST'])
+# def BuscarTask():
+#     if 'username' in session:
+#         con.connect()
+#         db = con.cursor()
+#         if request.method == 'POST':
+#             busqueda = request.form['busqueda']
+#             sql = f"select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector, codigoSupervisor from empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and sector.Departamento_idDepartamento = departamento.idDepartamento and idEmpleado >5 and Nombre LIKE '%{busqueda}%' or Apellido LIKE '%{busqueda}%' or cargo LIKE '%{busqueda}%' or Sector LIKE '%{busqueda}%' or codigoSupervisor LIKE '{busqueda}%';"
+#             db.execute(sql)
+#             user = db.fetchall()
+#             db.close()
+#             con.close()
+#             data = []
+#             if user:
+#                 for usu in user:
+#                     datos={'id':usu[0],
+#                         'title':usu[1],
+#                             'description':usu[2],
+#                             'color':usu[3],
+#                             'start':usu[4],
+#                             'end':usu[5]
+#                         }
+#                 data.append(datos)
+#                 users = json.dumps(data)
+#                 return users

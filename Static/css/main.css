@@ -39,7 +39,6 @@ body {
   transform: translateY(1px);
 }
 
-
 .operaciones{
   transition: all 0.4s;
   transition-property: transform;
@@ -47,5 +46,3 @@ body {
 .operaciones:hover{
   transform: translateY(1px);
 }
-
-  
