@@ -50,7 +50,8 @@ def Home():
 def Index():
     con.connect()
     db=con.cursor()
-    db.execute('SELECT * FROM empresa.empleado')
+    db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                idEmpleado<6;''')
     data = db.fetchall()
     db.close()
     if data:
@@ -62,7 +63,7 @@ def Index():
     if data1:
         con.connect()
         db=con.cursor()
-        db.execute('SELECT * FROM empresa.departamento')
+        db.execute('SELECT * FROM empresa.empleado')
         data2 = db.fetchall()
         db.close()
     if data2:
@@ -80,7 +81,7 @@ def Index():
         data4 = db.fetchall()
         db.close()
     user = session['username']
-    return render_template('index.html', user=user, empleado=data, cargos=data1, depto=data2, empleados=data3, sector=data4)
+    return render_template('index.html', user=user, supervisor=data, cargos=data1, empleado=data2[0], empleados=data3, sector=data4)
 
 @app.route('/add_contact', methods=['POST'])
 def add_contact():
@@ -184,7 +185,7 @@ def VisualizarDepartamentos():
 
 
 # @app.route('/buscar', methods=['POST'])
-# def BuscarTask():
+# def Buscar():
 #     if 'username' in session:
 #         con.connect()
 #         db = con.cursor()
