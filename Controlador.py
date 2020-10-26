@@ -93,12 +93,20 @@ def add_contact():
         sueldo = request.form['sueldo']
         cargo = request.form['cargo']
         sector = request.form['sector']
+        supervisor = request.form['supervisor']
         con.connect()
         db=con.cursor()
-        db.execute("INSERT INTO empresa.empleado (nombre, apellido, email, telefono, sueldo, Cargo_idCargo, Sector_idSector) VALUES (%s,%s,%s,%s,%s,%s,%s)", (name, lastname, email, phone, sueldo, cargo, sector ))
-        con.commit()
-        flash('Empleado Added successfully')
-        return redirect(url_for('Index'))
+        db.execute('''SELECT idEmpleado FROM empresa.empleado where nombre = %s''', (supervisor))
+        data = db.fetchall()
+        db.close()
+        print(data)
+        if data:
+            con.connect()
+            db=con.cursor()
+            db.execute("INSERT INTO empresa.empleado (nombre, apellido, email, telefono, sueldo, codigoSupervisor, Cargo_idCargo, Sector_idSector) VALUES (%s,%s,%s,%s,%s,%s, %s,%s)", (name, lastname, email, phone, sueldo, data, cargo, sector ))
+            con.commit()
+            flash('Empleado Added successfully')
+            return redirect(url_for('Index'))
 
 @app.route('/edit/<id>', methods = ['POST', 'GET'])
 def get_contact(id):
@@ -183,6 +191,18 @@ def VisualizarDepartamentos():
     user = session['username']
     return render_template('departamentos.html', user=user, empleados=data, sup=data1)
 
+@app.route('/getSector/<string:id>', methods = ['POST','GET'])
+def getSector(id):
+    print(id)
+    con.connect()
+    db=con.cursor()
+    db.execute('''select nombre from empresa.empleado, empresa.sector
+    where idEmpleado<6 and sector.idSector = %s''',(id))
+    sector = db.fetchall()
+    con.commit()
+    print(sector)
+    sec = json.dumps(sector)
+    return sec
 
 # @app.route('/buscar', methods=['POST'])
 # def Buscar():

@@ -58,7 +58,7 @@
               </select>
             </div>
             <div class="form-group col-md-6">
-              <select name="sector" id="inputState" class="form-control">    
+              <select class="form-control sector" name="sector" id="inputState" class="form-control">    
                 <option selected>Seleccionar Sector...</option>
                 {% for sec in sector %}
                 <option value={{sec.0}}> {{sec.1}} </option>
@@ -68,13 +68,7 @@
           </div>
           <div class="form-row">
           <div class="form-group col-md-6">
-            <input type="text" class="form-control" name="supervisor" disabled placeholder="Supervisor" value="
-            {% for sup in supervisor %}
-              {% if empleado.8 == supervisor.0 %}
-              {{supervisor.1}} {{supervisor.2}}
-              {% endif %}
-            {% endfor %}
-            ">
+            <input type="text" class="form-control supervisor" name="supervisor"  placeholder="Supervisor">
           </div>
          </div>
             <button class="btn btn-primary btn-block">
