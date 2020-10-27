@@ -12,6 +12,7 @@ if(btnDelete) {
 
 $(document).ready(function(){
   console.log('funcionando');
+  $('#busqueda').focus();
     // FUNCION PARA LA SELECCION COMBOBOX
     $('.sector').change(function (e) { 
       e.preventDefault();
@@ -40,4 +41,48 @@ $(document).ready(function(){
       });
     });
     
+    // METODO BUSCAR POR FILTRO
+		$('#busqueda').on('keyup', function(e) {
+			if ($('#busqueda').val()) {
+
+				e.preventDefault();
+			   	var busqueda = $('#busqueda').val();
+			   	//console.log(busqueda);
+			   	$.ajax({
+			   		url: 'http://127.0.0.1:3000/buscar/',
+			   		type: 'POST',
+			   		data: {busqueda: busqueda},
+			   	})
+			   	.done(function(response) {
+			   		var result = JSON.parse(response);
+                    var temp = "";
+                    var i = 0;   
+                       //console.log(response);
+			   		result.forEach(res => {
+			   			temp += 
+			   					`
+                    <tr> 
+                        <td>${res.id}</td>
+                        <td>${res.nombre}</td>
+                        <td>${res.apellido}</td>
+                        <td>${res.sueldo}</td>
+                        <td>${res.cargo}</td>
+                        <td>${res.departamento}</td>
+                        <td>${res.sector}</td>
+                        <td>${res.supervisor}</td>
+                        <td>
+                          <a href="#" class="btn btn-default btn-sm operaciones"><i class="fas fa-edit fa-lg text-primary"></i></a>
+                          <a href="#" class="btn btn-default btn-delete btn-sm operaciones"><i class="far fa-trash-alt fa-lg text-danger"></i></a>
+                        </td>
+                    </tr>
+                    `
+                i++;
+			   		});
+			   		$('#tabla').html(temp);
+			   	})
+			   	.fail(function() {
+			   		console.log('Hubo un error =(');
+			   	});
+			}else {window.location.href = 'http://127.0.0.1:3000/visualizar-departamentos';}
+    });
 });
