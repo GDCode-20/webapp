@@ -59,6 +59,21 @@ $(document).ready(function(){
                     var i = 0;   
                        //console.log(response);
 			   		result.forEach(res => {
+               if(res.supervisor == 1){
+                res.supervisor = 'Juan Lopez'
+               }
+               else if(res.supervisor == 2){
+                res.supervisor = 'Admin'
+               }
+               else if(res.supervisor == 3){
+                res.supervisor = 'Carlos Herrera'
+               }
+               else if(res.supervisor == 4){
+                res.supervisor = 'Lucas Castro'
+               }
+               else{
+                  res.supervisor = 'Eduardo Ibarra'
+               }
 			   			temp += 
 			   					`
                     <tr> 
@@ -70,10 +85,6 @@ $(document).ready(function(){
                         <td>${res.departamento}</td>
                         <td>${res.sector}</td>
                         <td>${res.supervisor}</td>
-                        <td>
-                          <a href="#" class="btn btn-default btn-sm operaciones"><i class="fas fa-edit fa-lg text-primary"></i></a>
-                          <a href="#" class="btn btn-default btn-delete btn-sm operaciones"><i class="far fa-trash-alt fa-lg text-danger"></i></a>
-                        </td>
                     </tr>
                     `
                 i++;

@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # Importamos db y app para formar las rutas de la aplicacion
 from webapp import db, app, con
 import pdfkit
+from jinja2 import Environment, FileSystemLoader
 
 # Rutas de la aplicacion
 @app.route('/')
@@ -85,6 +86,7 @@ def Index():
         user = session['username']
         return render_template('index.html', user=user, supervisor=data, cargos=data1, empleado=data2[0], empleados=data3, sector=data4)
 
+# ABM
 @app.route('/add_contact', methods=['POST'])
 def add_contact():
     if 'username' in session:
@@ -211,19 +213,39 @@ def getSector(id):
         sec = json.dumps(sector)
         return sec
 
+# Generar reportes
+@app.route('/generarReporte/')
+def GenerarReporte():
+    return render_template('generar-reporte.html')
+
 @app.route('/getReporte/', methods=['POST', 'GET'])
 def getReporte():
     if 'username' in session:
-        if request.method == 'POST':
-            rendered = render_template('pdf.html')
-            pdf = pdfkit.from_string(rendered,False)
-            response = make_response(pdf)
-            response.headers['content-Type']='application/pdf'
-            response.headers['content-Disposition']='inline: filename=reporte.pdf'
-            return response
-        return redirect(url_for('VisualizarDepartamentos'))
+        con.connect()
+        db=con.cursor()
+        db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector, codigoSupervisor
+        FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+        where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+        = empleado.Sector_idSector and sector.Departamento_idDepartamento
+        = departamento.idDepartamento and idEmpleado >5;''')
+        data = db.fetchall()
+        db.close()
+        if data:
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                    idEmpleado<6;''')
+            data1 = db.fetchall()
+            db.close()
+        env = Environment(loader=FileSystemLoader('templates'))
+        template = env.get_template('pdf_template.html')
 
+        html = template.render(empleados=data, sup=data1)
+        pdfkit.from_string(html, 'Reporte.pdf')
+        return redirect(url_for('Home'))
+    return redirect(url_for('VisualizarDepartamentos'))
 
+# Errores
 @app.errorhandler(404)
 def error_404(e):
     return render_template('error/404.html'), 404
@@ -232,7 +254,7 @@ def error_404(e):
 def error_500(e):
     return render_template('error/500.html'), 500
 
-
+# Busqueda
 @app.route('/buscar/', methods=['POST'])
 def Buscar():
     if 'username' in session:
@@ -261,10 +283,4 @@ def Buscar():
                 users = json.dumps(data)
                 return users
 
-# con.connect()
-# db = con.cursor()
-# db.execute(f"select nombre, apellido FROM empresa.empleado where idEmpleado = '{usu[7]}';")
-# sup = db.fetchone()
-# db.close()
-# con.close()
-# print(sup)
+
