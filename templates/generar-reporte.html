@@ -9,19 +9,30 @@
     <a href="/home"><i class="fas fa-arrow-circle-left mb-4" style="font-size: 40px"></i></a>
 </div>
 <div class="row mt-2 pt-2">
-    <div class="col-md-6 m-auto mt-2">
-        <select class="form-contral" name="" id="">
-            <option class="form-contral" value="">Seleccionar departamento</option>
-            <option class="form-contral" value="">DEPA 1</option>
-        </select>
+    <div class="col-md-4 m-auto mt-2">
+        <button class="btn btn-block btn-primary">Generar reporte por Departamento</button>
+        <button class="btn btn-block btn-primary">Generar reporte por Antiguedad</button>
+        <button class="btn btn-block btn-primary">Generar reporte por Sueldos</button>
     </div>
-    <button class="btn btn-block btn-primary">Generar reporte</button>
 </div>
-  <div class="row mt-4 pt-4">
-    <div class="col-md-8 m-auto mt-2">
-        <!--  -->
+<div class="row mt-2 pt-2">
+    <div class="col-md-6 m-auto mt-2">
+        <form action="" method="post">
+            <div class="form-group">
+                <select class="form-contral" name="" id="">
+                    <option class="form-contral" >Seleccionar departamento</option>
+                    <option class="form-contral" >DEPA 1</option>
+                </select>
+            </div>
+        </form>
     </div>
-  </div>
+    <a href="/getReporte/" class="btn btn-block btn-success">Generar reporte</a>
+</div>
+<div class="row mt-4 pt-4">
+<div class="col-md-8 m-auto mt-2">
+    <!--  -->
+</div>
+</div>
 
 
 {% endblock %}

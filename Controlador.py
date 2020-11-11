@@ -216,7 +216,9 @@ def getSector(id):
 # Generar reportes
 @app.route('/generarReporte/')
 def GenerarReporte():
-    return render_template('generar-reporte.html')
+
+    user = session['username']
+    return render_template('generar-reporte.html', user=user)
 
 @app.route('/getReporte/', methods=['POST', 'GET'])
 def getReporte():
@@ -237,10 +239,21 @@ def getReporte():
                     idEmpleado<6;''')
             data1 = db.fetchall()
             db.close()
+            if data1:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select sueldo as Sueldo FROM empresa.empleado where
+                        idEmpleado>5;''')
+                data2 = db.fetchall()
+                db.close()
+                sueldo = 0
+                for suel in data2:
+                    sueldo = sueldo + suel[0]
+                print(sueldo)
         env = Environment(loader=FileSystemLoader('templates'))
         template = env.get_template('pdf_template.html')
 
-        html = template.render(empleados=data, sup=data1)
+        html = template.render(empleados=data, sup=data1, sueldo=sueldo)
         pdfkit.from_string(html, 'Reporte.pdf')
         return redirect(url_for('Home'))
     return redirect(url_for('VisualizarDepartamentos'))

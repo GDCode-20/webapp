@@ -11,17 +11,37 @@
     <!-- Custom CSS -->
 </head>
 <body>
-<div class="mr-auto">
-    <!-- AGREGAR DATOS EMPRESA -->
-</div>
-<div class="row mt-2 pt-2">
-    <div class="col-md-6 m-auto mt-2">
+
+<div class="row mt-4 pt-4">
+    <div class="col-md-8 m-auto mt-2">
+      <h1 class="text-center text-muted">Reporte</h1>
+      <div class="row">
+          <div class="col-md-6">
+              <span style="font-size: 15px;" class="form-control"><b>Razón Social:</b> SysCompany</span>
+              <span style="font-size: 15px;" class="form-control"><b>Dirección:</b> Av. Aconquija 2000</span>
+              <span style="font-size: 15px;" class="form-control"><b>Email:</b> SysCompany@gmail.com</span>
+              <span style="font-size: 15px;" class="form-control"><b>Telefono:</b> 4356897</span>
+          </div>
+          <div class="col-md-5">
+            <!-- <img width="200px" height="150px" src="http://127.0.0.1:3000/static/img/logo.jpeg" alt="logo empresa" style="border-radius: 5%;"> -->
+          </div>
+      </div>
     </div>
 </div>
 <!-- AGREGAR IMAGENES REPORTE -->
 <div class="row mt-4 pt-4">
     <div class="col-md-8 m-auto mt-2">
         <table class="table table-sm bg-white">
+          <thead>
+            <th>ID</th>
+            <th>NOMBRE</th>
+            <th>APELLIDO</th>
+            <th>SUELDO</th>
+            <th>CARGO</th>
+            <th>DEPARTAMENTO</th>
+            <th>SECTOR</th>
+            <th>SUPERVISOR</th>
+          </thead>
           <tbody id="tabla">
             {% for contact in empleados %}
             <tr>
@@ -33,17 +53,23 @@
               <td>{{contact.5}}</td>
               <td>{{contact.6}}</td>
               {% if contact.7 %}
-                {% for super in sup %}
-                    {% if contact.7 == super.0 %}
-                    <td>{{super.1}} {{super.2}}</td>
-                    {% endif %}
-                {% endfor %}
-                {% else %}
-                    <td>supervisor</td>
-            {% endif %}
+                  {% for super in sup %}
+                      {% if contact.7 == super.0 %}
+                      <td>{{super.1}} {{super.2}}</td>
+                      {% endif %}
+                  {% endfor %}
+                      {% else %}
+                        <td>supervisor</td>
+              {% endif %}
             </tr>
             {% endfor %}
           </tbody>
+          <tfoot>
+            <th></th>
+            <th></th>
+            <th>TOTAL:</th>
+            <th>$ {{ sueldo }}</th>
+          </tfoot>
         </table>
     </div>
 </div>
