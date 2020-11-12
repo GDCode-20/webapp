@@ -118,7 +118,7 @@ def get_contact(id):
     if 'username' in session:
         con.connect()
         db=con.cursor()
-        db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.idCargo, cargo.descripcion, sector.idSector, sector.descripcion 
+        db.execute('''SELECT idEmpleado, nombre, apellido, email, telefono,sueldo, cargo.idCargo, cargo.descripcion, sector.idSector, sector.descripcion,codigoSupervisor
         FROM empresa.empleado, empresa.cargo, empresa.sector 
         WHERE cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and idEmpleado = %s''', (id))
         data = db.fetchall()
@@ -135,8 +135,15 @@ def get_contact(id):
             db.execute('SELECT * FROM empresa.sector')
             data2 = db.fetchall()
             db.close()
+        if data2:
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                    idEmpleado<6;''')
+            data3 = db.fetchall()
+            db.close()
         user = session['username']
-        return render_template('edit-contact.html', user=user, empleados= data[0], cargos=data1, sector=data2)
+        return render_template('edit-contact.html', user=user, empleados= data[0], cargos=data1, sector=data2, sup=data3)
 
 @app.route('/update/<id>', methods=['POST'])
 def update_contact(id):
@@ -149,6 +156,7 @@ def update_contact(id):
             sueldo = request.form['sueldo']
             cargo = request.form['cargo']
             sector = request.form['sector']
+            supervisor = request.form['supervisor']
             con.connect()
             db=con.cursor()
             db.execute("""
@@ -159,9 +167,10 @@ def update_contact(id):
                     telefono = %s,
                     sueldo = %s,
                     Cargo_idCargo = %s,
-                    Sector_idSector = %s
+                    Sector_idSector = %s,
+                    codigoSupervisor = %s
                 WHERE idEmpleado = %s
-            """, (name, lastname, email, phone, sueldo, cargo, sector, id))
+            """, (name, lastname, email, phone, sueldo, cargo, sector, supervisor, id))
             flash('Empleado actualizado satisfactoriamente')
             con.commit()
             return redirect(url_for('Index'))
@@ -382,44 +391,6 @@ def reporte():
             response.headers['content-Disposition']='inline: filename=reporte_fecha.pdf'
             return response
     return redirect(url_for('GenerarReporte'))
-
-@app.route('/getReporte/', methods=['POST', 'GET'])
-def getReporte():
-    if 'username' in session:
-        con.connect()
-        db=con.cursor()
-        db.execute('''select idEmpleado as Id, nombre as Nombre, apellido as Apellido,sueldo as Sueldo, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector, codigoSupervisor
-        FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
-        where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
-        = empleado.Sector_idSector and sector.Departamento_idDepartamento
-        = departamento.idDepartamento and idEmpleado >5;''')
-        data = db.fetchall()
-        db.close()
-        if data:
-            con.connect()
-            db=con.cursor()
-            db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
-                    idEmpleado<6;''')
-            data1 = db.fetchall()
-            db.close()
-            if data1:
-                con.connect()
-                db=con.cursor()
-                db.execute('''select sueldo as Sueldo FROM empresa.empleado where
-                        idEmpleado>5;''')
-                data2 = db.fetchall()
-                db.close()
-                sueldo = 0
-                for suel in data2:
-                    sueldo = sueldo + suel[0]
-                print(sueldo)
-        env = Environment(loader=FileSystemLoader('templates'))
-        template = env.get_template('pdf_template.html')
-
-        html = template.render(empleados=data, sup=data1, sueldo=sueldo)
-        pdfkit.from_string(html, 'Reporte.pdf')
-        return redirect(url_for('Home'))
-    return redirect(url_for('VisualizarDepartamentos'))
 
 # Errores
 @app.errorhandler(404)
