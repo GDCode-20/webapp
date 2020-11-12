@@ -214,11 +214,174 @@ def getSector(id):
         return sec
 
 # Generar reportes
-@app.route('/generarReporte/')
+@app.route('/generarReporte/', methods=['POST','GET'])
 def GenerarReporte():
+    if 'username' in session:
+        con.connect()
+        db=con.cursor()
+        db.execute('''select departamento.idDepartamento, departamento.descripcion from empresa.departamento''')
+        depto = db.fetchall()
+        con.commit()
+        user = session['username']
+        return render_template('generar-reporte.html', user=user, depto=depto)
 
-    user = session['username']
-    return render_template('generar-reporte.html', user=user)
+@app.route('/reporte/', methods=['POST','GET'])
+def reporte():
+    if request.method == 'POST':
+        depa = request.form['departamento']
+        tipo = request.form['tipo']
+        # Selecciona todos y que muestre los departamentos y sectores
+        if depa == 'todos' and tipo == '0':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre as Nombre, apellido as Apellido, cargo.descripcion as Cargo, departamento.descripcion as Departamento, sector.descripcion as Sector, codigoSupervisor FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector = empleado.Sector_idSector and sector.Departamento_idDepartamento = departamento.idDepartamento and idEmpleado >5;''')
+            data = db.fetchall()
+            print(data)
+            db.close()
+            if data:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                        idEmpleado<6;''')
+                sup = db.fetchall()
+                db.close()    
+            rendered = render_template('reportes/report-depa-todos.html', empleados=data, sup=sup)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_departamentos.pdf'
+            return response
+        # Selecciona todos y que muestre los sueldos
+        elif depa == 'todos' and tipo == '1':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre, apellido, cargo.descripcion, sueldo, departamento.descripcion, sector.descripcion, codigoSupervisor
+            FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+            where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+            = empleado.Sector_idSector and sector.Departamento_idDepartamento
+            = departamento.idDepartamento and idEmpleado >5;''')
+            data1 = db.fetchall()
+            db.close()
+            if data1:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select sueldo as Sueldo FROM empresa.empleado where
+                        idEmpleado>5;''')
+                dat = db.fetchall()
+                db.close()
+                sueldo = 0
+                for suel in dat:
+                    sueldo = sueldo + suel[0]
+                if dat:
+                    con.connect()
+                    db=con.cursor()
+                    db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                            idEmpleado<6;''')
+                    sup = db.fetchall()
+                    db.close()
+            rendered = render_template('reportes/report-sueldo-todos.html', empleados=data1, sueldo=sueldo, sup=sup)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_sueldos.pdf'
+            return response
+
+        # Selecciona todos y que muestre por fecha
+        elif depa == 'todos' and tipo == '2':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre, apellido, departamento.descripcion, fecha_ingreso
+            FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+            where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+            = empleado.Sector_idSector and sector.Departamento_idDepartamento
+            = departamento.idDepartamento and idEmpleado >5 ORDER BY fecha_ingreso DESC;''')
+            data2 = db.fetchall()
+            db.close()
+            rendered = render_template('reportes/report-fecha-todos.html', empleados=data2)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_fecha.pdf'
+            return response
+        
+        # Selecciona un departamento y quiere ver los empleados por departamento
+        elif depa and tipo == '0':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre, apellido,cargo.descripcion, departamento.descripcion, sector.descripcion, codigoSupervisor
+            FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+            where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+            = empleado.Sector_idSector and sector.Departamento_idDepartamento
+            = departamento.idDepartamento and idEmpleado >5 and departamento.descripcion = %s;''',(depa))
+            data3 = db.fetchall()
+            db.close()
+            if data3:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                        idEmpleado<6;''')
+                sup = db.fetchall()
+                db.close()
+            rendered = render_template('reportes/report-depa.html', empleados=data3, sup=sup, depa=depa)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_depa.pdf'
+            return response
+
+        elif depa and tipo == '1':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre, apellido,sueldo, cargo.descripcion, departamento.descripcion, sector.descripcion, codigoSupervisor
+            FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+            where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+            = empleado.Sector_idSector and sector.Departamento_idDepartamento
+            = departamento.idDepartamento and idEmpleado >5 and departamento.descripcion = %s;''',(depa))
+            data4 = db.fetchall()
+            db.close()
+            if data4:
+                sueldo = 0
+                for suel in data4:
+                    sueldo = sueldo + suel[3]
+            if data4:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                        idEmpleado<6;''')
+                sup = db.fetchall()
+                db.close()
+            rendered = render_template('reportes/report-sueldo.html', empleados=data4, sup=sup, depa=depa, sueldo=sueldo)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_sueldo.pdf'
+            return response
+        
+        # Se selecciona un departamento y el reporte por fecha
+        elif depa and tipo == '2':
+            con.connect()
+            db=con.cursor()
+            db.execute('''select idEmpleado, nombre, apellido, departamento.descripcion, fecha_ingreso
+            FROM empresa.empleado, empresa.cargo, empresa.departamento, empresa.sector 
+            where cargo.idCargo = empleado.Cargo_idCargo and sector.idSector
+            = empleado.Sector_idSector and sector.Departamento_idDepartamento
+            = departamento.idDepartamento and idEmpleado >5 and departamento.descripcion = %s ORDER BY empleado.fecha_ingreso DESC;''',(depa))
+            data5 = db.fetchall()
+            db.close()
+            if data5:
+                con.connect()
+                db=con.cursor()
+                db.execute('''select idEmpleado as Id, nombre, apellido FROM empresa.empleado where
+                        idEmpleado<6;''')
+                sup = db.fetchall()
+                db.close()
+            rendered = render_template('reportes/report-fecha.html', empleados=data5, sup=sup, depa=depa)
+            pdf = pdfkit.from_string(rendered, False)
+            response = make_response(pdf)
+            response.headers['content-Type']='application/pdf'
+            response.headers['content-Disposition']='inline: filename=reporte_fecha.pdf'
+            return response
+    return redirect(url_for('GenerarReporte'))
 
 @app.route('/getReporte/', methods=['POST', 'GET'])
 def getReporte():

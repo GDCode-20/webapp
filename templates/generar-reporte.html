@@ -10,28 +10,46 @@
 </div>
 <div class="row mt-2 pt-2">
     <div class="col-md-4 m-auto mt-2">
-        <button class="btn btn-block btn-primary">Generar reporte por Departamento</button>
+
+        <!-- <button class="btn btn-block btn-primary">Generar reporte por Departamento</button>
         <button class="btn btn-block btn-primary">Generar reporte por Antiguedad</button>
-        <button class="btn btn-block btn-primary">Generar reporte por Sueldos</button>
+        <button class="btn btn-block btn-primary">Generar reporte por Sueldos</button> -->
     </div>
 </div>
+<h1 class="text-white text-center mt-4 mb-4">Sección de Reportes</h1>
+
 <div class="row mt-2 pt-2">
     <div class="col-md-6 m-auto mt-2">
-        <form action="" method="post">
-            <div class="form-group">
-                <select class="form-contral" name="" id="">
-                    <option class="form-contral" >Seleccionar departamento</option>
-                    <option class="form-contral" >DEPA 1</option>
-                </select>
+        <form action="/reporte/" method="post">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <select name="departamento" id="inputState" class="form-control text-light"
+                    style="background: #364f6b;">
+                      <option selected>Seleccionar Departamento...</option>
+                      <option value="todos">Todos</option>
+                      {% for op in depto %}
+                      <option value={{op.1}}> {{op.1}} </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <select name="tipo" id="inputState" class="form-control text-white" style="background:#364f6b;">
+                      <option selected>Seleccionar tipo de reporte...</option>
+                      <option value="0">Empleados por departamento</option>
+                      <option value="1">Empleados con sus sueldos</option>
+                      <option value="2">Empleados por fecha de antiguedad</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-block btn-info" type="submit">Generar reporte</button>
             </div>
+              
         </form>
     </div>
-    <a href="/getReporte/" class="btn btn-block btn-success">Generar reporte</a>
 </div>
 <div class="row mt-4 pt-4">
-<div class="col-md-8 m-auto mt-2">
+    <div class="col-md-8 m-auto mt-2">
     <!--  -->
-</div>
+    </div>
 </div>
 
 
