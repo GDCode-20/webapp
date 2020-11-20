@@ -15,26 +15,26 @@
           <form action="/update/{{empleados.0}}" method="POST">       
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <input type="text" class="form-control" name="name" value="{{empleados.1}}">
+                  <input type="text" class="form-control" name="name" value="{{empleados.1}}" required>
                 </div>
                 <div class="form-group col-md-6">
-                  <input type="text" class="form-control" name="lastname" value="{{empleados.2}}">
+                  <input type="text" class="form-control" name="lastname" value="{{empleados.2}}" required>
                 </div>
               </div>
               <div class="form-row">
               <div class="form-group col-md-6">
-                <input type="text" class="form-control" name="email" value="{{empleados.3}}" >
+                <input type="text" class="form-control" name="email" value="{{empleados.3}}" required>
               </div>
               <div class="form-group col-md-4">
-                <input type="text" class="form-control" name="phone" value="{{empleados.4}}"> 
+                <input type="text" class="form-control" name="phone" value="{{empleados.4}}" required> 
               </div>
               <div class="form-group col-md-2">
-                <input type="text" class="form-control" name="sueldo" value="{{empleados.5}}">
+                <input type="text" class="form-control" name="sueldo" value="{{empleados.5}}" required>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
-                <select id="inputState" name="cargo" class="form-control">
+                <select id="inputState" name="cargo" class="form-control" required>
                   <option selected value="{{empleados.6}}">{{empleados.7}}</option>
                   {% for op in cargos %}
                   <option value={{op.0}}> {{op.1}} </option>
@@ -42,7 +42,7 @@
                 </select>
               </div>
               <div class="form-group col-md-6">
-                <select id="inputState" name="sector" class="form-control sector">
+                <select id="inputState" name="sector" class="form-control sector" required>
                   <option selected value="{{empleados.8}}">{{empleados.9}}</option>
                   {% for sec in sector %}
                   <option value={{sec.0}}> {{sec.1}} </option>
