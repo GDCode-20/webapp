@@ -214,7 +214,7 @@ def getSector(id):
         print(id)
         con.connect()
         db=con.cursor()
-        db.execute('''select nombre from empresa.empleado, empresa.sector
+        db.execute('''select idEmpleado, nombre from empresa.empleado, empresa.sector
         where idEmpleado<6 and sector.idSector = %s''',(id))
         sector = db.fetchall()
         con.commit()

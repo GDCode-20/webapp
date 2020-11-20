@@ -23,24 +23,53 @@ $(document).ready(function(){
         success: function (response) {
           var result = JSON.parse(response)
             if (sector < 9) {
-              $('.supervisor').val(result[4]);
+              $('.supervisor').val(result[4][1]);
             }
             else if (sector > 17){
-              $('.supervisor').val(result[2]);
+              $('.supervisor').val(result[2][1]);
             }
             else if (sector > 15 && sector < 18){
-              $('.supervisor').val(result[0]);
+              $('.supervisor').val(result[0][1]);
             }
             else if (sector > 12 && sector < 16){
-              $('.supervisor').val(result[3]);
+              $('.supervisor').val(result[3][1]);
             }
             else if (sector > 8 && sector < 13){
-              $('.supervisor').val(result[1]);
+              $('.supervisor').val(result[1][1]);
             }
         }
       });
     });
     
+
+    // FUNCION PARA SELECCION COMBO EDIT
+    $('.sector-edit').change(function (e) { 
+      e.preventDefault();
+      const sector = $('.sector-edit :selected').val();
+      $.ajax({
+        type: "GET",
+        url: "http://127.0.0.1:3000/getSector/"+sector,
+        success: function (response) {
+          var result = JSON.parse(response)
+            if (sector < 9) {
+              $('.supervisor-edit').val(result[4][0]);
+            }
+            else if (sector > 17){
+              $('.supervisor-edit').val(result[2][0]);
+            }
+            else if (sector > 15 && sector < 18){
+              $('.supervisor-edit').val(result[0][0]);
+            }
+            else if (sector > 12 && sector < 16){
+              $('.supervisor-edit').val(result[3][0]);
+            }
+            else if (sector > 8 && sector < 13){
+              $('.supervisor-edit').val(result[1][0]);
+            }
+        }
+      });
+    }); 
+
     // METODO BUSCAR POR FILTRO
 		$('#busqueda').on('keyup', function(e) {
 			if ($('#busqueda').val()) {
